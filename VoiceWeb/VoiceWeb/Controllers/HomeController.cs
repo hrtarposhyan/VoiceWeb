@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using VoiceWeb.Context;
 using VoiceWeb.Models;
 
 namespace VoiceWeb.Controllers
@@ -16,9 +17,10 @@ namespace VoiceWeb.Controllers
     {
         private readonly ILogger<HomeController> _logger;
         private readonly IWebHostEnvironment _appEnvironment;
-
-        public HomeController(ILogger<HomeController> logger, IWebHostEnvironment _appEnvironment)
+        private readonly UtypoDbContext _utypoDbContext;
+        public HomeController(ILogger<HomeController> logger, IWebHostEnvironment _appEnvironment, UtypoDbContext _utypoDbContext)
         {
+            this._utypoDbContext = _utypoDbContext;
             this._appEnvironment = _appEnvironment;
             _logger = logger;
         }
@@ -27,13 +29,13 @@ namespace VoiceWeb.Controllers
         {
             return View();
         }
-
-        public IActionResult VoiceRecord(IFormFile file)
+        public IActionResult UploadVoice(IFormFile file)
         {
-            using(var filestream=new FileStream(_appEnvironment.WebRootPath + "/Files/" + file.Name, FileMode.Create))
+            using(var s=new FileStream(_appEnvironment.WebRootPath + "/Files/" + file.FileName, FileMode.Create))
             {
-                file.CopyTo(filestream);
+                file.CopyTo(s);
             }
+            
             return RedirectToAction("Index");
         }
         public IActionResult Privacy()
@@ -41,7 +43,7 @@ namespace VoiceWeb.Controllers
             return View();
         }
         [HttpPost]
-        public IActionResult UploadVoice(IFormFile recording, string fileName)
+        public IActionResult UploadVoiceRecord(IFormFile recording, string fileName)
         {
             return Ok();
         }
